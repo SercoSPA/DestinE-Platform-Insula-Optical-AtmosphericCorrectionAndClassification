@@ -1,0 +1,6 @@
+#venv with python 3.12.4
+click
+geopandas
+setuptools
+netCDF4
+rioxarray

@@ -1,0 +1,132 @@
+<graph id="Graph">
+  <version>1.0</version>
+
+  <node id="Read">
+    <operator>Read</operator>
+    <sources/>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <useAdvancedOptions>false</useAdvancedOptions>
+      <file>$input_img</file>
+      <bandNames>quality_flags,longitude,latitude,conc_chl,pixel_classif_flags</bandNames>
+      <maskNames>quality_flags_land,quality_flags_straylight_risk,quality_flags_cosmetic,quality_flags_sun_glint_risk,quality_flags_dubious,IDEPIX_INVALID,IDEPIX_CLOUD,IDEPIX_CLOUD_AMBIGUOUS,IDEPIX_CLOUD_BUFFER,IDEPIX_SNOW_ICE,IDEPIX_BRIGHT</maskNames>
+      <copyMetadata>true</copyMetadata>
+    </parameters>
+  </node>
+
+  <node id="BandMaths">
+    <operator>BandMaths</operator>
+    <sources>
+      <sourceProduct refid="Read"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <targetBands>
+        <targetBand>
+          <name>Filtered_conc_chl</name>
+          <type>float32</type>
+          <expression>if IDEPIX_CLOUD or IDEPIX_CLOUD_AMBIGUOUS or IDEPIX_CLOUD_BUFFER or IDEPIX_INVALID or quality_flags_cosmetic or quality_flags_dubious or IDEPIX_BRIGHT or quality_flags_straylight_risk or quality_flags_sun_glint_risk or IDEPIX_SNOW_ICE then NaN else conc_chl</expression>
+          <description/>
+          <unit/>
+          <noDataValue>0.0</noDataValue>
+        </targetBand>
+      </targetBands>
+      <variables/>
+    </parameters>
+  </node>
+
+  <node id="Reproject">
+    <operator>Reproject</operator>
+    <sources>
+      <sourceProduct refid="Subset"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <wktFile/>
+      <crs>GEOGCS[&quot;WGS84(DD)&quot;, &#xd;
+  DATUM[&quot;WGS84&quot;, &#xd;
+    SPHEROID[&quot;WGS84&quot;, 6378137.0, 298.257223563]], &#xd;
+  PRIMEM[&quot;Greenwich&quot;, 0.0], &#xd;
+  UNIT[&quot;degree&quot;, 0.017453292519943295], &#xd;
+  AXIS[&quot;Geodetic longitude&quot;, EAST], &#xd;
+  AXIS[&quot;Geodetic latitude&quot;, NORTH], &#xd;
+  AUTHORITY[&quot;EPSG&quot;,&quot;4326&quot;]]</crs>
+      <resampling>Nearest</resampling>
+      <referencePixelX/>
+      <referencePixelY/>
+      <easting/>
+      <northing/>
+      <orientation/>
+      <pixelSizeX/>
+      <pixelSizeY/>
+      <width/>
+      <height/>
+      <tileSizeX/>
+      <tileSizeY/>
+      <orthorectify>false</orthorectify>
+      <elevationModelName/>
+      <noDataValue>NaN</noDataValue>
+      <includeTiePointGrids>true</includeTiePointGrids>
+      <addDeltaBands>false</addDeltaBands>
+    </parameters>
+  </node>
+
+  <node id="Subset">
+    <operator>Subset</operator>
+    <sources>
+      <sourceProduct refid="BandMaths"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <sourceBands/>
+      <geoRegion>$geo_region</geoRegion>
+      <subSamplingX>1</subSamplingX>
+      <subSamplingY>1</subSamplingY>
+      <fullSwath>false</fullSwath>
+      <tiePointGridNames/>
+      <copyMetadata>true</copyMetadata>
+    </parameters>
+  </node>
+
+  <node id="BandSelect">
+    <operator>BandSelect</operator>
+    <sources>
+      <sourceProduct refid="Reproject"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <selectedPolarisations/>
+      <sourceBands>Filtered_conc_chl</sourceBands>
+      <bandNamePattern>Filtered_conc_chl</bandNamePattern>
+    </parameters>
+  </node>
+
+  <node id="Write">
+    <operator>Write</operator>
+    <sources>
+      <sourceProduct refid="BandSelect"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <file>$output_product</file>
+      <formatName>GeoTIFF</formatName>
+    </parameters>
+  </node>
+
+  <applicationData id="Presentation">
+    <Description/>
+    <node id="Read">
+            <displayPosition x="37.0" y="134.0"/>
+    </node>
+    <node id="BandMaths">
+      <displayPosition x="140.0" y="115.0"/>
+    </node>
+    <node id="Reproject">
+      <displayPosition x="348.0" y="136.0"/>
+    </node>
+    <node id="Subset">
+      <displayPosition x="271.0" y="105.0"/>
+    </node>
+    <node id="BandSelect">
+      <displayPosition x="427.0" y="82.0"/>
+    </node>
+    <node id="Write">
+      <displayPosition x="703.0" y="121.0"/>
+    </node>
+  </applicationData>
+</graph>
+
